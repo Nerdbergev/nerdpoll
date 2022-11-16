@@ -24,3 +24,14 @@ class TelegramUserVote(db.Model):
    voting = db.Column(db.Integer)
    telegramuser = db.relationship(Telegramuser)
    vote = db.relationship(Vote)
+      
+def get_or_create(session, model, **kwargs):
+    instance = session.query(model).filter_by(**kwargs).first()
+    if instance:
+        return instance
+    else:
+        instance = model(**kwargs)
+        session.add(instance)
+        session.commit()
+        session.refresh(instance)
+        return instance
