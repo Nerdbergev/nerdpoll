@@ -9,6 +9,7 @@ AVATARURL = prefix + key + '/getUserProfilePhotos'
 GETFILE = prefix + key + '/getFile'
 FILEPREFIX = 'https://api.telegram.org/file/bot' + key + '/'
 WEBHOOKURL = 'https://poll.nerdberg.de/api/telegram'
+DOORURL = 'https://status.nerdberg.de/api/doorstatus/'
 
 TEXT = 'Hast du heute \($day\) vor in den Nerdberg zu kommen?'
 OPTIONS = (
