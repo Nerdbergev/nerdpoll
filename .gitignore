@@ -4,6 +4,7 @@ database.db
 __pycache__
 .vscode
 .github
-instance/
+src/instance/config.py
+src/instance/sqlite.db
 src/static/avatare/*.png
 src/static/avatare/*.jpg
