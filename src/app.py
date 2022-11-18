@@ -61,10 +61,11 @@ def vote():
     telegram.editMessage(vote.chat, vote.telegramid)
     return redirect(url_for('index'))
 
-@app.route('newvote')
+@app.route('/api/newvote/<chat>')
 def newvote(chat):
     from string import Template
     from datetime import datetime
+    telegram = Telegram()
     text = Template(app.config['TEXT']).substitute(day=datetime.now().strftime("%A"))
     id = telegram.sendPoll(chat, text)
     telegram.saveVote(chat, id, text)      
