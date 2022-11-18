@@ -19,3 +19,4 @@ OPTIONS = (
     "Nein"
 )
 SQLALCHEMY_DATABASE_URI = 'sqlite:///sqlite.db'
+UPLOAD_PATH = '/opt/nerdbergbot/src/static/avatare'

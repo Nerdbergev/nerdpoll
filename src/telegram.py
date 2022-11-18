@@ -48,7 +48,7 @@ class Telegram():
             filename = self.getFiles(file_id)
             extension = filename.split(".")[-1]
             response = requests.get(app.config['FILEPREFIX']+filename, stream=True)
-            with open('static/avatare/' + str(user.telegramid) + '.' + extension, 'wb') as out_file:
+            with open(app.config['UPLOAD_PATH'] + '/' + str(user.telegramid) + '.' + extension, 'wb') as out_file:
                 shutil.copyfileobj(response.raw, out_file)
                 user.icon = str(user.telegramid) + '.' + extension
                 db.session.commit()

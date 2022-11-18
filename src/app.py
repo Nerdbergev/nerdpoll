@@ -9,7 +9,7 @@ app= Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('config.py')
 
 db.init_app(app)
-locale.setlocale(locale.LC_ALL, "German")
+locale.setlocale(locale.LC_ALL, "de_DE.utf-8")
 
 @app.before_first_request
 def before_first_request_func():
