@@ -1,0 +1,73 @@
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#242e3a"/>
+<meta name="description" content="NerdPoll"/>
+<link rel="stylesheet" tyle="text/css" href="{{ url_for('static', filename='css/style.css')}}" />
+<title>NerdPoll</title>
+
+<style>
+</style>
+
+
+<script>
+    window.onload = (event) => {
+        // Get the modal
+        var modal = document.getElementById("vote_dialog");
+        // Get the button that opens the modal
+        var btn = document.getElementById("vote");
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+        // When the user clicks the button, open the modal
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+    };
+    </script>
+    <div id="vote_dialog" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>
+    {% for oid, option in options.items() %}
+        <a href='{{ url_for("vote") }}?voting={{oid}}&pollid={{pollid}}&avatar={{avatar}}&username={{username}}'>{{option['text']}}</a>        
+    {% endfor %}
+        </p>
+      </div>
+    </div>
+
+<h3 id='vote'>{{question.replace('\(','(').replace('\)',')')}}</h3>
+
+
+<table>
+{% for oid, option in options.items() %}
+    {% if option['voters']|length %}
+        <tr class='h'><td colspan='2'>{{option['text']}}</td><td class='peps'>{{option['voters']|length}} Leute</td></tr>
+    {% endif %}
+	{% for uid in option['voters'] %}
+		<tr>
+            <td class='imgbox'>
+                {%- if uid['icon'] and uid['telegramid'] %}
+                <img src='{{ url_for('static', filename='avatare/'+ uid["icon"])}}' />
+                {%- elif uid['icon'] and not uid['telegramid'] %}
+                <img src='{{uid["icon"]}}' />
+
+                {%- endif %}</td>
+            <td colspan='2'>
+                {%- if uid['username'] %}{{ uid['name'] }} ({{ uid['username'] }})
+                {%- else %}
+                {{ uid['name'] }}
+                {%- endif%}
+            </td>
+        </tr>
+    {% endfor %}
+{% endfor %}     
+</table>

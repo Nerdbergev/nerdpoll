@@ -2,3 +2,8 @@ venv/
 config.yaml
 database.db
 __pycache__
+.vscode
+.github
+instance/
+src/static/avatare/*.png
+src/static/avatare/*.jpg
