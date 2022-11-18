@@ -4,6 +4,7 @@ from sqlalchemy import desc
 import requests
 import locale
 from telegram import Telegram
+from door import is_door_open
  
 app= Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('config.py')
@@ -37,7 +38,7 @@ def index():
     for vote in votesWeb:
         options[vote.voting]['voters'].append(vote.webuser)        
         
-    return render_template("overview.html", pollid=dbvote.id, question=dbvote.question, options=options, username=username, avatar=avatar)
+    return render_template("overview.html", pollid=dbvote.id, question=dbvote.question, options=options, username=username, avatar=avatar, door_open=is_door_open())
 
 
 @app.route('/vote')
