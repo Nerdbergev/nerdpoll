@@ -14,6 +14,10 @@ locale.setlocale(locale.LC_ALL, "de_DE.utf-8")
 
 @app.before_first_request
 def before_first_request_func():
+    data = {
+        "url": app.config['WEBHOOKURL'],
+        }
+    response = requests.post(app.config['SETWEBHOOKURL'], data=data)    
     db.create_all()
 
 @app.route('/api/telegram', methods=['POST'])
@@ -74,8 +78,4 @@ def newvote(chat):
         
     
 if __name__ == '__main__':
-    data = {
-        "url": app.config['WEBHOOKURL'],
-        }
-    response = requests.post(app.config['SETWEBHOOKURL'], data=data)    
     app.run(debug=True)

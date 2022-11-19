@@ -24,7 +24,7 @@ class Telegram():
         data = {
             "chat_id": chat,
             "text": question,
-            "parse_mode": "MarkdownV2",
+            "parse_mode": "HTML",
             "reply_markup": self.generateKeyboard()
             }
         response = requests.post(app.config['SENDURL'], data=data)
@@ -59,7 +59,7 @@ class Telegram():
             "chat_id": chatid,
             "text": newtext,
             "message_id": messageid,
-            "parse_mode": "MarkdownV2",
+            "parse_mode": "HTML",
             "reply_markup": self.generateKeyboard()
             }
         r = requests.post(app.config['EDITURL'], data=data)
@@ -83,12 +83,12 @@ class Telegram():
         
         for oid,oitem in options.items():
             if len(oitem['voters']):
-                string += "\r\n*"+app.config['OPTIONS'][oid]+"*: \("+str(len(oitem['voters']))+" Entitäten\)\r\n"
+                string += "\r\n<b>"+app.config['OPTIONS'][oid]+"</b>: ("+str(len(oitem['voters']))+" Entitäten)\r\n"
                 for votes in oitem['voters']:
                     if isinstance(votes, Telegramuser):
-                        string += "\u2022 ["                
+                        string += f"\u2022 <a href=\"tg://user?id={votes.telegramid}\">"                
                         string += votes.username if votes.username else votes.name
-                        string += f"](tg://user?id={votes.telegramid})\r\n"
+                        string += f"</a>\r\n"
                     else:
                         string += "\u2022 "+votes.name+"\r\n"
         
