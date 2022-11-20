@@ -5,6 +5,7 @@ from datetime import datetime
 import requests
 import json
 import shutil
+from door import is_door_open
 
 
 class Telegram():
@@ -23,7 +24,7 @@ class Telegram():
     def sendPoll(self, chat, question):
         data = {
             "chat_id": chat,
-            "text": question,
+            "text": question+"\r\n"+self.getDoorMessage(is_door_open(app)),
             "parse_mode": "HTML",
             "reply_markup": self.generateKeyboard()
             }
@@ -64,7 +65,7 @@ class Telegram():
             }
         r = requests.post(app.config['EDITURL'], data=data)
         
-    def editMessage(self, chatid, messageid):
+    def editMessage(self, chatid, messageid, app=app):
         poll = db.session.query(Vote).filter(Vote.chat == chatid, Vote.telegramid==messageid).first()
         votingsTelegram = db.session.query(TelegramUserVote).join(Telegramuser). \
             filter(TelegramUserVote.vote_id==poll.id).order_by(TelegramUserVote.voting)
@@ -91,6 +92,8 @@ class Telegram():
                         string += f"</a>\r\n"
                     else:
                         string += "\u2022 "+votes.name+"\r\n"
+                        
+        string += "\r\n"+self.getDoorMessage(is_door_open(app))
         
         self.sendEditMessage(chatid, messageid, poll.question+"\r\n"+string if poll.question else string)
         
@@ -107,11 +110,43 @@ class Telegram():
         else:
             return dbuser.first()
 
+    def getDoorMessage(self, door):
+        from door import is_door_open
+        if door:
+            return f"\r\nDie Tür ist aktuell <b>offen</b>."
+        else:
+            return f"\r\nDie Tür ist aktuell <b>geschlossen</b>."
+            
 
     def saveVote(self, chat, id, text):
         db.session.add(Vote(telegramid=id, chat=chat, question=text))
         db.session.commit()
-
+        
+    def pinMessage(self, chatid, messageid):
+        data = {
+            "chat_id": chatid,
+            "message_id": messageid,
+            "disable_notification": True,
+            }
+        r = requests.post(app.config['PINMESSAGE'], data=data)
+    
+    def unpinMessage(self, chatid, messageid):
+        data = {
+            "chat_id": chatid,
+            "message_id": messageid,
+            }
+        r = requests.post(app.config['UNPINMESSAGE'], data=data)
+    
+    def pinMessageAndUnpinRecent(self, chat, id):
+        dbvote = db.session.query(Vote).filter(Vote.chat == chat, Vote.pinned==True)
+        for vote in dbvote:
+            vote.pinned = False
+            self.unpinMessage(vote.chat, vote.telegramid)        
+        
+        newvote = db.session.query(Vote).filter(Vote.chat == chat, Vote.telegramid==id).first()
+        newvote.pinned = True
+        db.session.commit()
+        self.pinMessage(newvote.chat, newvote.telegramid)
 
     def updateVoting(self, user, chatid, vote, voting):
         dbvote = db.session.query(Vote).filter(Vote.telegramid==vote, Vote.chat==chatid ).first()

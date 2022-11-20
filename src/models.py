@@ -22,6 +22,7 @@ class Vote(db.Model):
     question = db.Column(db.String)
     telegramid = db.Column(db.Integer)
     chat = db.Column(db.String)
+    pinned = db.Column(db.Boolean)
     
 class TelegramUserVote(db.Model):
     __tablename__ = 'telegramuservote'

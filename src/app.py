@@ -4,10 +4,20 @@ from sqlalchemy import desc
 import requests
 import locale
 from telegram import Telegram
-from door import is_door_open
+from door import is_door_open, is_door_changed 
+from flask_apscheduler import APScheduler
+
  
 app= Flask(__name__, instance_relative_config=True)
+
+
 app.config.from_pyfile('config.py')
+
+
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
+
 
 db.init_app(app)
 locale.setlocale(locale.LC_ALL, "de_DE.utf-8")
@@ -19,7 +29,17 @@ def before_first_request_func():
         }
     response = requests.post(app.config['SETWEBHOOKURL'], data=data)    
     db.create_all()
-
+    
+@scheduler.task('cron', id='do_job_2', minute='*')
+def updateDoorState():
+    with scheduler.app.app_context():        
+        if is_door_changed(scheduler.app):
+            dbvote = db.session.query(Vote).filter(Vote.pinned==True)
+            telegram = Telegram()
+            for vote in dbvote:
+                telegram.editMessage(vote.chat, vote.telegramid, app=scheduler.app)
+        
+        
 @app.route('/api/telegram', methods=['POST'])
 def telegram():
     telegram = Telegram()
@@ -42,7 +62,7 @@ def index():
     for vote in votesWeb:
         options[vote.voting]['voters'].append(vote.webuser)        
         
-    return render_template("overview.html", pollid=dbvote.id, question=dbvote.question, options=options, username=username, avatar=avatar, door_open=is_door_open())
+    return render_template("overview.html", pollid=dbvote.id, question=dbvote.question, options=options, username=username, avatar=avatar, door_open=is_door_open(app))
 
 
 @app.route('/vote')
@@ -73,9 +93,12 @@ def newvote(chat):
     telegram = Telegram()
     text = Template(app.config['TEXT']).substitute(day=datetime.now().strftime("%A"))
     id = telegram.sendPoll(chat, text)
-    telegram.saveVote(chat, id, text)      
+    telegram.saveVote(chat, id, text)
+    telegram.pinMessageAndUnpinRecent(chat, id)  
+    return {'state': True}
          
         
     
 if __name__ == '__main__':
+    
     app.run(debug=True)
