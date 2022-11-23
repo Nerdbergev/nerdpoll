@@ -70,6 +70,10 @@ class Telegram():
         
     def editMessage(self, chatid, messageid, app=app):
         poll = db.session.query(Vote).filter(Vote.chat == chatid, Vote.telegramid==messageid).first()
+        if not poll:
+            print(f"Error, no Vote found with chatid: {chatid}, messageid: {messageid}")
+            return False
+
         votingsTelegram = db.session.query(TelegramUserVote).join(Telegramuser). \
             filter(TelegramUserVote.vote_id==poll.id).order_by(TelegramUserVote.voting)
         votingsWeb = db.session.query(WebUserVote).join(Webuser). \
