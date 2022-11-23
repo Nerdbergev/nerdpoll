@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, Response
 from models import db, TelegramUserVote, Vote, Webuser, WebUserVote, get_or_create
 from sqlalchemy import desc
 import requests
@@ -6,6 +6,7 @@ import locale
 from telegram import Telegram
 from door import is_door_open, is_door_changed 
 from flask_apscheduler import APScheduler
+from message import MessageAnnouncer
 
  
 app= Flask(__name__, instance_relative_config=True)
@@ -17,6 +18,8 @@ app.config.from_pyfile('config.py')
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
+announcer = MessageAnnouncer()
+telegram = Telegram(announcer=announcer)
 
 
 db.init_app(app)
@@ -35,14 +38,12 @@ def updateDoorState():
     with scheduler.app.app_context():        
         if is_door_changed(scheduler.app):
             dbvote = db.session.query(Vote).filter(Vote.pinned==True)
-            telegram = Telegram()
             for vote in dbvote:
                 telegram.editMessage(vote.chat, vote.telegramid, app=scheduler.app)
         
         
 @app.route('/api/telegram', methods=['POST'])
-def telegram():
-    telegram = Telegram()
+def telegramEndpoint():
     telegram.parseUpdate(request.json)
     return ""
 
@@ -82,21 +83,31 @@ def vote():
     user.icon = request.args.get('avatar')
     voting.voting = request.args.get('voting')
     db.session.commit()
-    telegram = Telegram()
     telegram.editMessage(vote.chat, vote.telegramid)
+    announcer.announce("newVote")
     return redirect(url_for('index'))
 
 @app.route('/api/newvote/<chat>')
 def newvote(chat):
     from string import Template
     from datetime import datetime
-    telegram = Telegram()
     text = Template(app.config['TEXT']).substitute(day=datetime.now().strftime("%A"))
     id = telegram.sendPoll(chat, text)
     telegram.saveVote(chat, id, text)
     telegram.pinMessageAndUnpinRecent(chat, id)  
+    announcer.announce("newPoll")
     return {'state': True}
-         
+   
+@app.route('/listen', methods=['GET'])
+def listen():
+
+    def stream():
+        messages = announcer.listen()  # returns a queue.Queue
+        while True:
+            msg = messages.get()  # blocks until a new message arrives
+            yield msg
+
+    return Response(stream(), mimetype='text/event-stream')         
         
     
 if __name__ == '__main__':

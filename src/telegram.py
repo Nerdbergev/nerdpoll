@@ -9,6 +9,9 @@ from door import is_door_open
 
 
 class Telegram():
+    def __init__(self, announcer):
+        self.announcer = announcer
+    
     def generateKeyboard(self):
         array = []
         for id, option in enumerate(app.config['OPTIONS']):
@@ -158,6 +161,7 @@ class Telegram():
         else:
             dbvoting.voting = voting
             db.session.commit()
+            self.announcer.announce("newVote")
             return True
 
 

@@ -30,6 +30,11 @@
             modal.style.display = "none";
           }
         }
+        const evtSource = new EventSource("/listen");
+        evtSource.onmessage = function(event) {
+          const msg = event.data;
+          console.log(msg);
+        }        
     };
     </script>
 
