@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, Response
 from models import db, TelegramUserVote, Vote, Webuser, WebUserVote, get_or_create
 from sqlalchemy import desc
+import queue
 import requests
 import locale
 from telegram import Telegram
@@ -103,9 +104,15 @@ def listen():
 
     def stream():
         messages = announcer.listen()  # returns a queue.Queue
-        while True:
-            msg = messages.get()  # blocks until a new message arrives
-            yield msg
+        while announcer.has_active_listener(messages):
+            try:
+                msg = messages.get()  # blocks until a new message arrives
+                yield msg
+            except queue.Empty:
+                # this queue ran full and was removed
+                # so we need to disconnect this session to let the
+                # client autoreconnect
+                pass
 
     return Response(stream(), mimetype='text/event-stream')         
         
