@@ -59,8 +59,10 @@
 
 <table>
 {% for oid, option in options.items() %}
-    {% if option['voters']|length %}
-        <tr class='h'><td colspan='2'>{{option['text']}}</td><td class='peps'>{{option['voters']|length}} Leute</td></tr>
+    {% if option['voters']|length > 1 %}
+        <tr class='h'><td colspan='2'>{{option['text']}}</td><td class='peps'>{{option['voters']|length}} Menschen</td></tr>
+    {% elif  option['voters']|length %}
+        <tr class='h'><td colspan='2'>{{option['text']}}</td><td class='peps'>{{option['voters']|length}} Mensch</td></tr>
     {% endif %}
 	{% for uid in option['voters'] %}
 		<tr>
