@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, Response
+from flask import Flask, request, render_template, redirect, url_for, Response, jsonify
 from models import db, TelegramUserVote, Vote, Webuser, WebUserVote, get_or_create
 from sqlalchemy import desc
 import requests
@@ -110,6 +110,25 @@ def listen():
     return Response(stream(), mimetype='text/event-stream')         
         
     
+@app.route('/manifest')
+def manifest():
+    avatar = request.args.get('avatar')
+    username = request.args.get('username')
+    m = {
+        "short_name": "NerdPoll",
+        "name": "NerdPoll",
+        "start_url": url_for('index', avatar=avatar, username=username),
+        "display": "standalone",
+        "theme_color": "#242e3a",
+        "background_color": "#242e3a",
+        "icons": [{
+                "src": url_for('static', filename='img/logo.png'),
+                "sizes": "640x640",
+                "type": "image/png"
+        }]
+    }
+    return jsonify(m)
+
 if __name__ == '__main__':
     
     app.run(debug=True)
