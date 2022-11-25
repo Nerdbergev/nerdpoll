@@ -86,7 +86,7 @@ def vote():
     db.session.commit()
     telegram.editMessage(vote.chat, vote.telegramid)
     announcer.announce(announcer.format_sse(vote, "newvote"))
-    return redirect(url_for('index'))
+    return redirect(url_for('index', avatar=avatar, username=username))
 
 @app.route('/api/newvote/<chat>')
 def newvote(chat):
