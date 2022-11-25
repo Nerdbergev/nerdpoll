@@ -105,3 +105,10 @@ a {
 	background-color: #00c200;
 	text-align: center;
 }
+
+.pill {
+	color: #efefef;
+	background: #3f5263;
+	padding: 0 0.55em;
+	border-radius: 100em / 100em;
+}

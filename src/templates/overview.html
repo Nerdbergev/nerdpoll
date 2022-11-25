@@ -61,7 +61,7 @@
 <table>
 {% for oid, option in options.items() %}
     {% if option['voters']|length %}
-        <tr class='h'><td colspan='2'>{{option['text']}}</td><td class='peps'>{{option['voters']|length}} Leute</td></tr>
+        <tr class='h'><td colspan='2'>{{option['text']}}</td><td class='peps'><span class='pill'>{{option['voters']|length}}</span></td></tr>
     {% endif %}
 	{% for uid in option['voters'] %}
 		<tr>
