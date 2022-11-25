@@ -5,6 +5,9 @@ class MessageAnnouncer:
     def __init__(self):
         self.listeners = []
 
+    def has_active_listener(self, q):
+        return q in self.listeners
+
     def listen(self):
         q = queue.Queue(maxsize=5)
         self.listeners.append(q)
