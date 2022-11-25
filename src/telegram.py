@@ -165,7 +165,7 @@ class Telegram():
         else:
             dbvoting.voting = voting
             db.session.commit()
-            self.announcer.announce("newVote")
+            self.announcer.announce(self.announcer.format_sse(vote, "newvote"))
             return True
 
 

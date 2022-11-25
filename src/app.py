@@ -85,7 +85,7 @@ def vote():
     voting.voting = request.args.get('voting')
     db.session.commit()
     telegram.editMessage(vote.chat, vote.telegramid)
-    announcer.announce("newVote")
+    announcer.announce(announcer.format_sse(vote, "newvote"))
     return redirect(url_for('index'))
 
 @app.route('/api/newvote/<chat>')
@@ -96,7 +96,7 @@ def newvote(chat):
     id = telegram.sendPoll(chat, text)
     telegram.saveVote(chat, id, text)
     telegram.pinMessageAndUnpinRecent(chat, id)
-    announcer.announce("newPoll")
+    announcer.announce(announcer.format_sse(vote, "newpoll"))
     return {'state': True}
 
 @app.route('/listen', methods=['GET'])

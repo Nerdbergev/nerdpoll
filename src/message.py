@@ -19,3 +19,9 @@ class MessageAnnouncer:
                 self.listeners[i].put_nowait(msg)
             except queue.Full:
                 del self.listeners[i]
+
+    def format_sse(data: str, event=None) -> str:
+        msg = f'data: {data}\n\n'
+        if event is not None:
+            msg = f'event: {event}\n{msg}'
+        return msg
