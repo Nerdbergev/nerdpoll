@@ -32,11 +32,13 @@
           }
         }
         const evtSource = new EventSource("/listen");
-        evtSource.onmessage = function(event) {
-          const msg = event.data;
-          console.log(msg);
-          window.location.reload();
-        }        
+        onmessage = function(event) {
+	  if(['newvote','newpoll'].includes(event.type))
+          	window.location.reload();
+        };
+	evtSource.addEventListener("newvote", onmessage);
+	evtSource.addEventListener("newpoll", onmessage);
+
     };
     </script>
 
