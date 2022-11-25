@@ -70,7 +70,8 @@
                 <img src='{{ url_for('static', filename='avatare/'+ uid["icon"])}}' />
                 {%- elif uid['icon'] and not uid['telegramid'] %}
                 <img src='{{uid["icon"]}}' />
-
+                {%- else %}
+                <img src='{{ url_for('static', filename='img/default_avatar.png')}}' />
                 {%- endif %}</td>
             <td colspan='2'>
                 {%- if uid['username'] %}{{ uid['name'] }} ({{ uid['username'] }})
