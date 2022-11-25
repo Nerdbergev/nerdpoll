@@ -20,7 +20,7 @@ class MessageAnnouncer:
             except queue.Full:
                 del self.listeners[i]
 
-    def format_sse(data: str, event=None) -> str:
+    def format_sse(self, data: str, event=None) -> str:
         msg = f'data: {data}\n\n'
         if event is not None:
             msg = f'event: {event}\n{msg}'
