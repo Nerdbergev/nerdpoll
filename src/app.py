@@ -71,8 +71,6 @@ def index():
 def vote():
     if not request.args.get('username'):
         return "Failed - No username"
-    if not request.args.get('avatar'):
-        return "Failed - No avatar"
     if not request.args.get('pollid'):
         return "Failed - No pollid"
     if not request.args.get('voting'):
@@ -86,7 +84,7 @@ def vote():
     db.session.commit()
     telegram.editMessage(vote.chat, vote.telegramid)
     announcer.announce(announcer.format_sse(vote, "newvote"))
-    return redirect(url_for('index', avatar=request.args.get('avatar'), username=request.args.get('username')))
+    return redirect(url_for('index', avatar=request.args.get('avatar', ''), username=request.args.get('username')))
 
 @app.route('/api/newvote/<chat>')
 def newvote(chat):
