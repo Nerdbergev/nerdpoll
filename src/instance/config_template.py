@@ -16,7 +16,7 @@ OPTIONS = (
     "Ja, den ganzen Abend",
     "Ja ab 21 Uhr",
     "Ja aber nur vor 21 Uhr",
-    "Ja aber nur wenn es nicht so voll ist",
+    "Vielleicht",
     "Nein"
 )
 SQLALCHEMY_DATABASE_URI = 'sqlite:///sqlite.db'
